@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #f4f1ea;
+  color: #022c22; /* emerald-950 */
+}
