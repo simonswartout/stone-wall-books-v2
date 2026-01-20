@@ -53,21 +53,49 @@ export default function HomeDashboard({ setTab }) {
                     </div>
                 </SectionCard>
 
-                <div className="grid gap-6 md:grid-cols-2">
-                    <div className="group relative overflow-hidden rounded-lg bg-emerald-900 p-8 text-amber-50 shadow-lg transition-transform hover:-translate-y-1">
-                        <h3 className="font-serif text-2xl font-bold">The Catalog</h3>
-                        <p className="mt-2 text-emerald-100/80 font-serif italic">Browse our current collection of treasures.</p>
-                        <button onClick={() => setTab("Catalog")} className="mt-6 flex items-center gap-2 font-bold text-amber-300 hover:text-amber-200 underline underline-offset-4 transition-colors">
-                            Search the shelves <ChevronRight className="h-4 w-4" />
-                        </button>
+                <div className="space-y-6">
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <div className="group relative overflow-hidden rounded-lg bg-emerald-900 p-8 text-amber-50 shadow-lg transition-transform hover:-translate-y-1">
+                            <h3 className="font-serif text-2xl font-bold">The Catalog</h3>
+                            <p className="mt-2 text-emerald-100/80 font-serif italic">Browse our current collection of treasures.</p>
+                            <button onClick={() => setTab("Catalog")} className="mt-6 flex items-center gap-2 font-bold text-amber-300 hover:text-amber-200 underline underline-offset-4 transition-colors">
+                                Search the shelves <ChevronRight className="h-4 w-4" />
+                            </button>
+                        </div>
+
+                        <div className="group relative overflow-hidden rounded-lg border border-amber-200 bg-amber-50 p-8 shadow-sm transition-transform hover:-translate-y-1">
+                            <h3 className="font-serif text-2xl font-bold text-emerald-950">Collaborate</h3>
+                            <p className="mt-2 text-emerald-800/70 font-serif italic">Learn how to share your books with our program.</p>
+                            <button onClick={() => setTab("Procurement Program")} className="mt-6 flex items-center gap-2 font-bold text-emerald-900 hover:text-emerald-700 underline underline-offset-4 transition-colors">
+                                Program Details <ChevronRight className="h-4 w-4" />
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="group relative overflow-hidden rounded-lg border border-amber-200 bg-amber-50 p-8 shadow-sm transition-transform hover:-translate-y-1">
-                        <h3 className="font-serif text-2xl font-bold text-emerald-950">Collaborate</h3>
-                        <p className="mt-2 text-emerald-800/70 font-serif italic">Learn how to share your books with our program.</p>
-                        <button onClick={() => setTab("Procurement Program")} className="mt-6 flex items-center gap-2 font-bold text-emerald-900 hover:text-emerald-700 underline underline-offset-4 transition-colors">
-                            Program Details <ChevronRight className="h-4 w-4" />
-                        </button>
+                    <div className="rounded-lg bg-white p-4 shadow-sm border">
+                        <h4 className="text-xs font-black uppercase tracking-widest text-emerald-800/40 mb-3">Featured</h4>
+                        <div className="grid grid-cols-2 gap-4">
+                            {[0,1].map(i => {
+                                const id = data.featured?.[i];
+                                const book = data.catalog?.find(b => b.id === id);
+                                return (
+                                    <div key={i} className="p-3 rounded border bg-emerald-50/30 flex flex-col items-start gap-2">
+                                        {book ? (
+                                            <>
+                                                <div className="h-20 w-full overflow-hidden rounded bg-white border">
+                                                    {book.images?.[0] ? <img src={book.images[0]} alt={book.title} className="h-full w-full object-cover" /> : <div className="text-xs p-3 text-emerald-700/40">No image</div>}
+                                                </div>
+                                                <div className="text-sm font-serif font-bold">{book.title}</div>
+                                                <div className="text-xs italic">by {book.author}</div>
+                                                <a className="mt-2 text-xs" href={book.ebayUrl} target="_blank" rel="noreferrer">View on eBay</a>
+                                            </>
+                                        ) : (
+                                            <div className="text-sm text-emerald-700/60">Empty slot — fill from Librarian Desk</div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>

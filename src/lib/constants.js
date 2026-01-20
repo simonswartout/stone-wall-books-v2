@@ -28,16 +28,22 @@ export const DEFAULT_DATA = {
         "New Arrivals", "Fiction", "Non-Fiction", "Fantasy & Sci-Fi",
         "Mystery & Thriller", "Poetry", "Local & New England"
     ],
+    genres: [
+        "Classics", "Literary Fiction", "Poetry", "History", "Fantasy & Sci-Fi", "Mystery & Thriller", "Local & New England"
+    ],
+    featured: [null, null],
     catalog: [
         {
             id: "swb-0001",
             title: "The Old Man and the Sea",
             author: "Ernest Hemingway",
             category: "Fiction",
+            genre: "Classics",
             condition: "Very Good",
             shortDescription: "A classic tale of an aging fisherman's struggle with a giant marlin.",
             ebayUrl: "https://www.ebay.com/",
             tags: ["classic", "hardcover"],
+            images: [],
         },
     ],
 };

@@ -170,6 +170,36 @@ export default function LibrarianDesk() {
                                     />
                                 </div>
                             </div>
+
+                            <div className="mt-4 bg-white p-3 rounded border">
+                                <h5 className="text-xs font-black uppercase tracking-widest text-emerald-800/40 mb-2">Featured Listings</h5>
+                                <div className="grid gap-2">
+                                    {[0,1].map(i => (
+                                        <div key={i} className="flex items-center gap-2">
+                                            <label className="text-xs w-24">Slot {i+1}</label>
+                                            <select id={`featured-slot-${i}`} defaultValue={data.featured?.[i] || ""} className="flex-1 text-xs p-2 border rounded bg-white">
+                                                <option value="">— None —</option>
+                                                {data.catalog.map(b => <option key={b.id} value={b.id}>{b.title} — {b.author}</option>)}
+                                            </select>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="mt-2 flex gap-2 justify-end">
+                                    <Button variant="outline" className="text-[10px] py-1" onClick={() => {
+                                        // Restore defaults
+                                        const newData = { ...data, featured: [null, null] };
+                                        setDoc(getStoreConfigRef(db, appId), newData);
+                                        alert('Featured slots cleared');
+                                    }}>Clear Featured</Button>
+                                    <Button className="text-[10px] py-1" onClick={() => {
+                                        const a = (document.getElementById('featured-slot-0').value) || null;
+                                        const b = (document.getElementById('featured-slot-1').value) || null;
+                                        const newData = { ...data, featured: [a, b] };
+                                        setDoc(getStoreConfigRef(db, appId), newData);
+                                        alert('Featured updated!');
+                                    }}>Save Featured</Button>
+                                </div>
+                            </div>
                             <div className="flex justify-between items-center">
                                 <p className="text-[10px] text-emerald-800/60 italic">Changes here update the Home and Footer links.</p>
                                 <div className="flex gap-2">

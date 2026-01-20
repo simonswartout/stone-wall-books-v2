@@ -8,12 +8,14 @@ import app from '../../lib/firebase';
 export default function BookEditor({ book, onSave, onCancel, onDelete }) {
     const { data } = useStore();
     const categories = data.categories || ["Fiction"]; // Fallback
+    const genres = data.genres || ["General"];
 
     const [formData, setFormData] = useState({
         id: "",
         title: "",
         author: "",
         category: "Fiction",
+        genre: genres[0] || "General",
         condition: "Good",
         shortDescription: "",
         ebayUrl: "",
@@ -39,6 +41,7 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
                 title: "",
                 author: "",
                 category: "Fiction",
+                genre: genres[0] || "General",
                 condition: "Good",
                 shortDescription: "",
                 ebayUrl: "",
@@ -131,6 +134,18 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
                                 className="w-full rounded bg-emerald-50/50 border border-emerald-900/10 p-2 text-sm focus:ring-2 focus:ring-amber-400 outline-none"
                             />
                         </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-emerald-900 uppercase mb-1">Genre</label>
+                        <select
+                            name="genre"
+                            value={formData.genre}
+                            onChange={handleChange}
+                            className="w-full rounded bg-emerald-50/50 border border-emerald-900/10 p-2 text-sm focus:ring-2 focus:ring-amber-400 outline-none"
+                        >
+                            {genres.map(g => <option key={g} value={g}>{g}</option>)}
+                        </select>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
