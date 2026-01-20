@@ -161,11 +161,6 @@ export default function CatalogView() {
                                 <div key={book.id} className="group flex flex-col h-full bg-[#fdfcf8] border border-emerald-900/10 rounded overflow-hidden shadow-sm hover:shadow-md transition-all">
                                     <div className="h-2 bg-emerald-800/10 group-hover:bg-amber-400 transition-colors" />
 
-                                    {/* Images disabled */}
-                                    <div className="h-44 bg-emerald-50/50 flex items-center justify-center overflow-hidden">
-                                        <div className="text-sm text-emerald-700/40">No images</div>
-                                    </div>
-
                                     <div className="p-6 flex-grow">
                                         <div className="flex justify-between items-start gap-2 mb-3">
                                             <Pill>{book.category}</Pill>
@@ -204,11 +199,6 @@ export default function CatalogView() {
                     {filteredCatalog.map(book => (
                         <div key={book.id} className="group flex flex-col h-full bg-[#fdfcf8] border border-emerald-900/10 rounded overflow-hidden shadow-sm hover:shadow-md transition-all">
                             <div className="h-2 bg-emerald-800/10 group-hover:bg-amber-400 transition-colors" />
-
-                            {/* Images disabled */}
-                            <div className="h-44 bg-emerald-50/50 flex items-center justify-center overflow-hidden">
-                                <div className="text-sm text-emerald-700/40">No images</div>
-                            </div>
 
                             <div className="p-6 flex-grow">
                                 <div className="flex justify-between items-start gap-2 mb-3">
