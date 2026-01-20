@@ -167,9 +167,7 @@ export default function HomeDashboard({ setTab }) {
                         </div>
                     </div> 
                 </div>
-            </div>
-
-            <aside className="space-y-6">
+                <aside className="space-y-6">
                 <div className="rounded-lg bg-[#e9e4d7] p-6 shadow-inner border border-emerald-900/5">
                     <h4 className="font-serif text-xs font-black uppercase tracking-widest text-emerald-800/60 mb-4">Shop Information</h4>
                     <div className="space-y-4 text-sm font-serif">
@@ -187,6 +185,7 @@ export default function HomeDashboard({ setTab }) {
                     </div>
                 </div>
             </aside>
+            </div>
 
             {isEditorOpen && (
                 <BookEditor
