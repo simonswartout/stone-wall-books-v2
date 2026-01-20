@@ -122,7 +122,7 @@ export default function HomeDashboard({ setTab }) {
                                     const id = data.featured?.[i];
                                     const book = data.catalog?.find(b => b.id === id);
                                     return (
-                                        <div key={i} className="group flex flex-col h-full bg-[#fdfcf8] border border-emerald-900/10 rounded medieval-panel overflow-hidden shadow-sm hover:shadow-md transition-all">
+                                        <div key={i} className="group flex flex-col h-full bg-[#fdfcf8] border border-emerald-900/10 rounded overflow-hidden shadow-sm hover:shadow-md transition-all">
                                             <div className="h-2 bg-emerald-800/10 group-hover:bg-amber-400 transition-colors" />
 
                                             <div className="p-6 flex-grow">

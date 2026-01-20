@@ -36,14 +36,7 @@ export function StoreProvider({ children }) {
         return user.email === data.shop.librarianEmail;
     }, [user, data.shop.librarianEmail]);
 
-    // Toggle page-level medieval theme class when the store's theme is set
-    useEffect(() => {
-        if (data?.theme === 'medieval' || data?.theme === 'medieval-week') {
-            document.body.classList.add('medieval');
-        } else {
-            document.body.classList.remove('medieval');
-        }
-    }, [data?.theme]);
+
 
     return (
         <StoreContext.Provider value={{ data, setData, isLibrarian }}>
