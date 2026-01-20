@@ -30,3 +30,48 @@ body {
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
+
+/* Medieval Europe Week theme (subtle) */
+body.medieval {
+  /* keep overall page backgrounds the same but warm up accents */
+  --medieval-border: #6b3f23; /* warm brown */
+  --medieval-ink: #2f1f14;
+  --medieval-parchment: linear-gradient(180deg, #fff9ef 0%, #f6efe0 100%);
+}
+
+body.medieval .medieval-panel {
+  border: 1px solid var(--medieval-border) !important;
+  border-style: double !important;
+  background: var(--medieval-parchment) !important;
+  box-shadow: 10px 14px 30px rgba(0,0,0,0.06), inset 0 0 0 2px rgba(255,250,240,0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+body.medieval .medieval-panel::after {
+  content: "✠";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--medieval-border);
+  opacity: 0.08;
+  font-size: 28px;
+  pointer-events: none;
+}
+
+body.medieval .medieval-modal .medieval-header {
+  background: linear-gradient(90deg, rgba(107,66,38,0.95), rgba(58,38,25,0.95));
+  color: #fff6e6 !important;
+  border-bottom: 4px solid rgba(107,66,38,0.6);
+  font-family: 'Spectral', serif;
+}
+
+body.medieval .medieval-panel label,
+body.medieval .medieval-panel .font-serif,
+body.medieval .medieval-panel .font-mono {
+  color: var(--medieval-ink) !important;
+}
+
+body.medieval .medieval-panel .border-t {
+  border-color: rgba(107,66,38,0.15) !important;
+}

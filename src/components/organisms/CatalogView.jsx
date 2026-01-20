@@ -158,7 +158,7 @@ export default function CatalogView() {
                         <h4 className="text-lg font-serif font-bold text-emerald-900">{g}</h4>
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {books.map(book => (
-                                <div key={book.id} className="group flex flex-col h-full bg-[#fdfcf8] border border-emerald-900/10 rounded overflow-hidden shadow-sm hover:shadow-md transition-all">
+                                <div key={book.id} className="group flex flex-col h-full bg-[#fdfcf8] border border-emerald-900/10 rounded medieval-panel overflow-hidden shadow-sm hover:shadow-md transition-all">
                                     <div className="h-2 bg-emerald-800/10 group-hover:bg-amber-400 transition-colors" />
 
                                     <div className="p-6 flex-grow">
@@ -197,7 +197,7 @@ export default function CatalogView() {
             ) : (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {filteredCatalog.map(book => (
-                        <div key={book.id} className="group flex flex-col h-full bg-[#fdfcf8] border border-emerald-900/10 rounded overflow-hidden shadow-sm hover:shadow-md transition-all">
+                        <div key={book.id} className="group flex flex-col h-full bg-[#fdfcf8] border border-emerald-900/10 rounded medieval-panel overflow-hidden shadow-sm hover:shadow-md transition-all">
                             <div className="h-2 bg-emerald-800/10 group-hover:bg-amber-400 transition-colors" />
 
                             <div className="p-6 flex-grow">

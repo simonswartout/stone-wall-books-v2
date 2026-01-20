@@ -32,6 +32,7 @@ export const DEFAULT_DATA = {
         "Classics", "Literary Fiction", "Poetry", "History", "Fantasy & Sci-Fi", "Mystery & Thriller", "Local & New England", "Non-Fiction"
     ],
     featured: [null, null],
+    theme: "medieval", // enable subtle medieval theme by default for the week
     catalog: [
         {
             id: "swb-0001",

@@ -78,8 +78,8 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/80 backdrop-blur-sm">
-            <div className="w-full max-w-2xl bg-[#fdfcf8] rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="px-6 py-4 bg-emerald-900 text-amber-50 flex justify-between items-center">
+            <div className="w-full max-w-2xl bg-[#fdfcf8] rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] medieval-panel medieval-modal">
+                <div className="px-6 py-4 bg-emerald-900 text-amber-50 flex justify-between items-center medieval-header">
                     <h3 className="font-serif font-bold">{book ? "Edit Book" : "Add New Book"}</h3>
                     <button onClick={onCancel} className="text-emerald-300 hover:text-white">&times; Close</button>
                 </div>
