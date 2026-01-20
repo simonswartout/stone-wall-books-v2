@@ -29,7 +29,7 @@ export const DEFAULT_DATA = {
         "Mystery & Thriller", "Poetry", "Local & New England"
     ],
     genres: [
-        "Classics", "Literary Fiction", "Poetry", "History", "Fantasy & Sci-Fi", "Mystery & Thriller", "Local & New England"
+        "Classics", "Literary Fiction", "Poetry", "History", "Fantasy & Sci-Fi", "Mystery & Thriller", "Local & New England", "Textbooks"
     ],
     featured: [null, null],
     catalog: [
