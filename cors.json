@@ -1,7 +1,9 @@
 [
   {
     "origin": [
-      "https://simonswartout.github.io"
+      "https://simonswartout.github.io",
+      "http://localhost:5173",
+      "http://localhost:3000"
     ],
     "method": ["GET", "HEAD", "PUT", "POST", "DELETE", "OPTIONS"],
     "responseHeader": [
@@ -9,7 +11,8 @@
       "Authorization",
       "x-goog-resumable",
       "x-goog-api-key",
-      "x-goog-user-project"
+      "x-goog-user-project",
+      "Access-Control-Allow-Origin"
     ],
     "maxAgeSeconds": 3600
   }
