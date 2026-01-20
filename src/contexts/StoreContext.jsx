@@ -17,7 +17,11 @@ export function StoreProvider({ children }) {
         const unsubscribe = onSnapshot(dataRef, (snapshot) => {
             if (snapshot.exists()) {
                 const remoteData = snapshot.data();
-                setData(prev => ({ ...prev, ...remoteData }));
+                // Merge default lists (genres/categories) with remote data so new defaults are available
+                const mergedGenres = Array.from(new Set([...(DEFAULT_DATA.genres || []), ...(remoteData.genres || [])]));
+                const mergedCategories = Array.from(new Set([...(DEFAULT_DATA.categories || []), ...(remoteData.categories || [])]));
+                const mergedData = { ...DEFAULT_DATA, ...remoteData, genres: mergedGenres, categories: mergedCategories };
+                setData(mergedData);
             } else {
                 setDoc(dataRef, DEFAULT_DATA).catch(err => console.error("Initial write error:", err));
             }
