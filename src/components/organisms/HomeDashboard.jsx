@@ -123,34 +123,52 @@ export default function HomeDashboard({ setTab }) {
                                     const id = data.featured?.[i];
                                     const book = data.catalog?.find(b => b.id === id);
                                     return (
-                                        <div key={i} className="p-3 rounded border bg-emerald-50/30 flex flex-col items-start gap-2 relative">
-                                            {isLibrarian && (
-                                                <div className="absolute top-2 right-2 flex gap-2">
-                                                    {book && <button onClick={() => openEditBook(book)} className="text-xs px-2 py-1 bg-amber-300 text-emerald-900 rounded">Edit</button>}
-                                                    <button onClick={() => { setAssigningSlot(i); setAssignValue(id || ""); }} className="text-xs px-2 py-1 bg-emerald-100 text-emerald-900 rounded">Assign</button>
-                                                    {book && <button onClick={() => assignFeatured(i, null)} className="text-xs px-2 py-1 bg-rose-100 text-rose-700 rounded">Clear</button>}
-                                                </div>
-                                            )}
+                                        <div key={i} className="group flex flex-col h-full bg-[#fdfcf8] border border-emerald-900/10 rounded overflow-hidden shadow-sm hover:shadow-md transition-all">
+                                            <div className="h-2 bg-emerald-800/10 group-hover:bg-amber-400 transition-colors" />
 
-                                            {book ? (
-                                                <>
-                                                    <div className="h-20 w-full overflow-hidden rounded bg-white border">
-                                                        {book.images?.[0] ? (
-                                                            <img src={book.images[0]} alt={book.title} className="h-full w-full object-cover" />
-                                                        ) : (
-                                                            <div className="text-xs p-3 text-emerald-700/40">No image</div>
-                                                        )}
-                                                    </div>
-                                                    <div className="text-sm font-serif font-bold">{book.title}</div>
-                                                    <div className="text-xs italic">by {book.author}</div>
-                                                    <a className="mt-2 text-xs" href={book.ebayUrl} target="_blank" rel="noreferrer">View on eBay</a>
-                                                </>
-                                            ) : (
-                                                <div className="text-sm text-emerald-700/60">Empty slot — assign from the librarian controls</div>
-                                            )}
+                                            {/* Image preview */}
+                                            <div className="h-44 bg-emerald-50/50 flex items-center justify-center overflow-hidden">
+                                                {book?.images?.[0] ? (
+                                                    <img src={book.images[0]} alt={book.title} className="h-full w-full object-cover" />
+                                                ) : (
+                                                    <div className="text-sm text-emerald-700/40">No image</div>
+                                                )}
+                                            </div>
+
+                                            <div className="p-6 flex-grow">
+                                                <div className="flex justify-between items-start gap-2 mb-3">
+                                                    <Pill>{book?.category || '—'}</Pill>
+                                                    {isLibrarian ? (
+                                                        <button onClick={() => book ? openEditBook(book) : setAssigningSlot(i)} className="text-[10px] uppercase font-bold text-amber-600 hover:text-amber-800 border border-amber-200 bg-amber-50 px-2 py-0.5 rounded-full hover:bg-amber-100">
+                                                            {book ? 'Edit' : 'Assign'}
+                                                        </button>
+                                                    ) : (
+                                                        <span className="text-[10px] font-mono text-emerald-800/40 uppercase">{book?.condition || ''}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex justify-between items-baseline mb-1 gap-2">
+                                                    <h3 className="font-serif text-xl font-black text-emerald-950 leading-tight">{book?.title || 'Empty Slot'}</h3>
+                                                    {book?.tags?.find(t => t.startsWith("Price: ")) && (
+                                                        <span className="font-mono text-lg font-bold text-emerald-700 whitespace-nowrap">
+                                                            {book.tags.find(t => t.startsWith("Price: ")).replace("Price: ", "")}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="font-serif italic text-emerald-800/70 text-sm mb-4">by {book?.author || ''}</p>
+                                                <p className="text-sm text-emerald-900/80 leading-relaxed line-clamp-3">{book?.shortDescription || ''}</p>
+                                            </div>
+                                            <div className="p-4 bg-emerald-50/30 border-t border-emerald-900/5 flex justify-between items-center">
+                                                <span className="text-[10px] text-emerald-800/40 font-mono">ID: {book?.id || '—'}</span>
+                                                <div className="flex gap-2">
+                                                    {book?.ebayUrl ? <a href={book.ebayUrl} target="_blank" rel="noreferrer"><Button variant="outline" className="py-1 text-xs">eBay</Button></a> : <div />}
+                                                    {isLibrarian && book && (
+                                                        <button onClick={() => assignFeatured(i, null)} className="text-xs px-2 py-1 bg-rose-100 text-rose-700 rounded">Clear</button>
+                                                    )}
+                                                </div>
+                                            </div>
 
                                             {assigningSlot === i && isLibrarian && (
-                                                <div className="mt-2 w-full">
+                                                <div className="p-4 border-t">
                                                     <select className="w-full p-2 border rounded text-sm" value={assignValue} onChange={(e) => setAssignValue(e.target.value)}>
                                                         <option value="">— None —</option>
                                                         {data.catalog?.map((b) => <option key={b.id} value={b.id}>{b.title} — {b.author}</option>)}
