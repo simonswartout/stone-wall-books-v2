@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Coffee, ExternalLink, ChevronRight, MapPin, Mail } from "lucide-react";
 import SectionCard from '../molecules/SectionCard';
 import Button from '../atoms/Button';
+import Pill from '../atoms/Pill';
 import BookEditor from './BookEditor';
 import { useAuth } from '../../contexts/AuthContext';
 import { useStore } from '../../contexts/StoreContext';
@@ -93,7 +94,7 @@ export default function HomeDashboard({ setTab }) {
                             <p>
                                 When you find a book in the catalog that speaks to you on this site, simply follow the link to our eBay page where transactions are handled securely.
                             </p>
-                            <p className="italic text-emerald-800">We believe every book deserves a new life.</p>
+                            <p className="italic text-emerald-800/70">We believe every book deserves a new life.</p>
                         </div>
                     </SectionCard>
 
