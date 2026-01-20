@@ -12,11 +12,24 @@ export default function CatalogView() {
     const { data, isLibrarian } = useStore();
     const [search, setSearch] = useState("");
     const [selectedGenre, setSelectedGenre] = useState("All");
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
     const [editingBook, setEditingBook] = useState(null);
     const [isEditorOpen, setIsEditorOpen] = useState(false);
 
+    const parsePriceFromBook = (book) => {
+        const priceTag = book.tags?.find(t => t.startsWith("Price: "));
+        if (!priceTag) return null;
+        const priceString = priceTag.replace("Price: ", "");
+        const num = parseFloat(priceString.replace(/[^0-9.]/g, ""));
+        return isNaN(num) ? null : num;
+    };
+
     const filteredCatalog = useMemo(() => {
         const items = data.catalog || [];
+        const min = minPrice !== "" ? parseFloat(minPrice) : null;
+        const max = maxPrice !== "" ? parseFloat(maxPrice) : null;
+
         return items.filter(item => {
             const matchesSearch = [item.title, item.author, item.shortDescription]
                 .some(field => field?.toLowerCase().includes(search.toLowerCase()));
@@ -24,9 +37,15 @@ export default function CatalogView() {
             const itemGenre = item.genre || "Uncategorized";
             const matchesGenre = selectedGenre === "All" || itemGenre === selectedGenre;
 
-            return matchesSearch && matchesGenre;
+            if (!(matchesSearch && matchesGenre)) return false;
+
+            const priceNum = parsePriceFromBook(item);
+            if (min !== null && (priceNum === null || priceNum < min)) return false;
+            if (max !== null && (priceNum === null || priceNum > max)) return false;
+
+            return true;
         });
-    }, [data.catalog, search, selectedGenre]);
+    }, [data.catalog, search, selectedGenre, minPrice, maxPrice]);
 
     const handleSaveBook = async (book) => {
         const currentCatalog = data.catalog || [];
@@ -86,7 +105,31 @@ export default function CatalogView() {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
-                <div className="flex gap-2 w-full md:w-auto">
+                <div className="flex gap-2 w-full md:w-auto items-center">
+                    <div className="flex gap-2 items-center">
+                        <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="Min $"
+                            className="w-20 rounded bg-emerald-800 border-none py-2 px-2 text-sm placeholder:text-emerald-400 outline-none focus:ring-2 focus:ring-amber-400"
+                            value={minPrice}
+                            onChange={(e) => setMinPrice(e.target.value)}
+                        />
+                        <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="Max $"
+                            className="w-20 rounded bg-emerald-800 border-none py-2 px-2 text-sm placeholder:text-emerald-400 outline-none focus:ring-2 focus:ring-amber-400"
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(e.target.value)}
+                        />
+                        {(minPrice || maxPrice) && (
+                            <button onClick={() => { setMinPrice(''); setMaxPrice(''); }} className="text-xs px-2 py-1 bg-rose-100 text-rose-700 rounded">Clear</button>
+                        )}
+                    </div>
+
                     <select
                         className="bg-emerald-800 text-sm rounded border-none py-2 px-4 focus:ring-2 focus:ring-amber-400 outline-none flex-grow md:w-40"
                         value={selectedGenre}
