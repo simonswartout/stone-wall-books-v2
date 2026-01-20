@@ -18,8 +18,6 @@ export default function HomeDashboard({ setTab }) {
 
     const [editingBook, setEditingBook] = useState(null);
     const [isEditorOpen, setIsEditorOpen] = useState(false);
-    const [assigningSlot, setAssigningSlot] = useState(null);
-    const [assignValue, setAssignValue] = useState("");
 
     const openEditBook = (book) => {
         setEditingBook(book);
@@ -140,7 +138,13 @@ export default function HomeDashboard({ setTab }) {
                                                 <div className="flex justify-between items-start gap-2 mb-3">
                                                     <Pill>{book?.category || '—'}</Pill>
                                                     {isLibrarian ? (
-                                                        <button onClick={() => book ? openEditBook(book) : setAssigningSlot(i)} className="text-[10px] uppercase font-bold text-amber-600 hover:text-amber-800 border border-amber-200 bg-amber-50 px-2 py-0.5 rounded-full hover:bg-amber-100">
+                                                        <button onClick={() => {
+                                                            if (book) openEditBook(book);
+                                                            else {
+                                                                const id = prompt('Enter book ID to assign to this slot');
+                                                                if (id) assignFeatured(i, id);
+                                                            }
+                                                        }} className="text-[10px] uppercase font-bold text-amber-600 hover:text-amber-800 border border-amber-200 bg-amber-50 px-2 py-0.5 rounded-full hover:bg-amber-100">
                                                             {book ? 'Edit' : 'Assign'}
                                                         </button>
                                                     ) : (
@@ -168,18 +172,7 @@ export default function HomeDashboard({ setTab }) {
                                                 </div>
                                             </div>
 
-                                            {assigningSlot === i && isLibrarian && (
-                                                <div className="p-4 border-t">
-                                                    <select className="w-full p-2 border rounded text-sm" value={assignValue} onChange={(e) => setAssignValue(e.target.value)}>
-                                                        <option value="">— None —</option>
-                                                        {data.catalog?.map((b) => <option key={b.id} value={b.id}>{b.title} — {b.author}</option>)}
-                                                    </select>
-                                                    <div className="mt-2 flex gap-2 justify-end">
-                                                        <button className="text-xs px-2 py-1 bg-emerald-100 rounded" onClick={() => assignFeatured(i, assignValue || null)}>Save</button>
-                                                        <button className="text-xs px-2 py-1 bg-white border rounded" onClick={() => setAssigningSlot(null)}>Cancel</button>
-                                                    </div>
-                                                </div>
-                                            )}
+                                            {/* simplified: Assign action uses prompt() to set featured by book id */}
                                         </div>
                                     );
                                 })}
