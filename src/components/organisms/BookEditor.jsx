@@ -2,14 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Button from '../atoms/Button';
 import Pill from '../atoms/Pill';
 import { useStore } from '../../contexts/StoreContext';
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import app from '../../lib/firebase';
-import { uploadToCloudinary } from '../../lib/cloudinary';
 
 export default function BookEditor({ book, onSave, onCancel, onDelete }) {
     const { data, isLibrarian } = useStore();
-    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-    const unsignedPreset = import.meta.env.VITE_CLOUDINARY_UNSIGNED_PRESET;
+
     const categories = data.categories || ["Fiction"]; // Fallback
     const genres = data.genres || ["General"];
 
@@ -23,11 +20,9 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
         shortDescription: "",
         ebayUrl: "",
         tags: [],
-        images: [],
         price: "" // Virtual field for editing
     });
 
-    const [newFiles, setNewFiles] = useState([]); // Files selected but not yet uploaded
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
@@ -35,8 +30,8 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
             // Extract price from tags for the form
             const priceTag = book.tags?.find(t => t.startsWith("Price: "));
             const price = priceTag ? priceTag.replace("Price: ", "") : "";
-            setFormData({ ...book, price, images: book.images || [], tags: book.tags || [] });
-            setNewFiles([]);
+            // Ignore existing images — images are disabled
+            setFormData({ ...book, price, tags: book.tags || [] });
         } else {
             // New book default
             setFormData({
@@ -61,18 +56,6 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleFileChange = (e) => {
-        const files = Array.from(e.target.files || []);
-        setNewFiles(prev => [...prev, ...files]);
-    };
-
-    const removeExistingImage = (index) => {
-        setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
-    };
-
-    const removeNewFile = (index) => {
-        setNewFiles(prev => prev.filter((_, i) => i !== index));
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -84,29 +67,9 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
             newTags.push(`Price: ${formData.price}`);
         }
 
-        // Upload new files to Firebase Storage and collect URLs
-        const storage = getStorage(app);
-        const existingImages = formData.images ? [...formData.images] : [];
-
-        for (const file of newFiles) {
-            try {
-                if (isLibrarian && cloudName && unsignedPreset) {
-                    // Prefer Cloudinary unsigned client upload for librarian mode
-                    const json = await uploadToCloudinary(file, { cloudName, unsignedPreset });
-                    existingImages.push(json.secure_url || json.url);
-                } else {
-                    const path = `images/${formData.id}/${Date.now()}_${file.name}`;
-                    const ref = storageRef(storage, path);
-                    await uploadBytes(ref, file);
-                    const url = await getDownloadURL(ref);
-                    existingImages.push(url);
-                }
-            } catch (err) {
-                console.error('Image upload failed', err);
-            }
-        }
-
-        const finalData = { ...formData, tags: newTags, images: existingImages };
+        // Images are disabled for now — remove any image references
+        const { images, ...rest } = formData;
+        const finalData = { ...rest, tags: newTags };
         delete finalData.price; // Don't save virtual field to DB structure strictly if we use tags
 
         await onSave(finalData);
@@ -222,30 +185,7 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
 
                     <div>
                         <label className="block text-xs font-bold text-emerald-900 uppercase mb-1">Images</label>
-                        <div className="flex flex-wrap gap-3 mb-2">
-                            {(formData.images || []).map((url, i) => (
-                                <div key={i} className="relative">
-                                    <img src={url} alt={`img-${i}`} className="h-20 w-20 object-cover rounded border" />
-                                    {isLibrarian && <button type="button" onClick={() => removeExistingImage(i)} className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full h-5 w-5 text-xs">×</button>}
-                                </div>
-                            ))}
-
-                            {isLibrarian && newFiles.map((file, i) => (
-                                <div key={i} className="relative">
-                                    <img src={URL.createObjectURL(file)} alt={file.name} className="h-20 w-20 object-cover rounded border" />
-                                    <button type="button" onClick={() => removeNewFile(i)} className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full h-5 w-5 text-xs">×</button>
-                                </div>
-                            ))}
-                        </div>
-
-                        {isLibrarian ? (
-                            <>
-                                <input type="file" accept="image/*" multiple onChange={handleFileChange} />
-                                <div className="text-xs text-amber-700 mt-2">Image uploads use Cloudinary (client-side) if configured, otherwise Firebase Storage is used.</div>
-                            </>
-                        ) : (
-                            <div className="text-xs text-emerald-700/60">Image uploads are only available to the librarian.</div>
-                        )}
+                            <div className="text-sm text-emerald-700/60">Image support is temporarily disabled for catalog entries.</div>
                     </div>
 
                     <div className="pt-4 flex justify-between items-center border-t border-emerald-900/10">

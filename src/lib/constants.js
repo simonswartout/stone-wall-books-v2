@@ -43,7 +43,6 @@ export const DEFAULT_DATA = {
             shortDescription: "A classic tale of an aging fisherman's struggle with a giant marlin.",
             ebayUrl: "https://www.ebay.com/",
             tags: ["classic", "hardcover"],
-            images: [],
         },
     ],
 };
