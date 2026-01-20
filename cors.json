@@ -1,0 +1,16 @@
+[
+  {
+    "origin": [
+      "https://simonswartout.github.io"
+    ],
+    "method": ["GET", "HEAD", "PUT", "POST", "DELETE", "OPTIONS"],
+    "responseHeader": [
+      "Content-Type",
+      "Authorization",
+      "x-goog-resumable",
+      "x-goog-api-key",
+      "x-goog-user-project"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]
