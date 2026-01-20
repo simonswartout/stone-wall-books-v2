@@ -108,6 +108,16 @@ export default function CatalogView() {
                 {filteredCatalog.map(book => (
                     <div key={book.id} className="group flex flex-col h-full bg-[#fdfcf8] border border-emerald-900/10 rounded overflow-hidden shadow-sm hover:shadow-md transition-all">
                         <div className="h-2 bg-emerald-800/10 group-hover:bg-amber-400 transition-colors" />
+
+                        {/* Image preview */}
+                        <div className="h-44 bg-emerald-50/50 flex items-center justify-center overflow-hidden">
+                            {book.images?.[0] ? (
+                                <img src={book.images[0]} alt={book.title} className="h-full w-full object-cover" />
+                            ) : (
+                                <div className="text-sm text-emerald-700/40">No image</div>
+                            )}
+                        </div>
+
                         <div className="p-6 flex-grow">
                             <div className="flex justify-between items-start gap-2 mb-3">
                                 <Pill>{book.category}</Pill>

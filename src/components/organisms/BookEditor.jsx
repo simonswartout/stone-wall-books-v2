@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Button from '../atoms/Button';
 import Pill from '../atoms/Pill';
 import { useStore } from '../../contexts/StoreContext';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import app from '../../lib/firebase';
 
 export default function BookEditor({ book, onSave, onCancel, onDelete }) {
     const { data } = useStore();
@@ -16,15 +18,20 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
         shortDescription: "",
         ebayUrl: "",
         tags: [],
+        images: [],
         price: "" // Virtual field for editing
     });
+
+    const [newFiles, setNewFiles] = useState([]); // Files selected but not yet uploaded
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         if (book) {
             // Extract price from tags for the form
             const priceTag = book.tags?.find(t => t.startsWith("Price: "));
             const price = priceTag ? priceTag.replace("Price: ", "") : "";
-            setFormData({ ...book, price });
+            setFormData({ ...book, price, images: book.images || [], tags: book.tags || [] });
+            setNewFiles([]);
         } else {
             // New book default
             setFormData({
@@ -36,8 +43,10 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
                 shortDescription: "",
                 ebayUrl: "",
                 tags: [],
+                images: [],
                 price: ""
             });
+            setNewFiles([]);
         }
     }, [book]);
 
@@ -46,8 +55,22 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files || []);
+        setNewFiles(prev => [...prev, ...files]);
+    };
+
+    const removeExistingImage = (index) => {
+        setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
+    };
+
+    const removeNewFile = (index) => {
+        setNewFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setUploading(true);
 
         // Sync price back to tags
         let newTags = formData.tags ? formData.tags.filter(t => !t.startsWith("Price: ")) : [];
@@ -55,10 +78,27 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
             newTags.push(`Price: ${formData.price}`);
         }
 
-        const finalData = { ...formData, tags: newTags };
+        // Upload new files to Firebase Storage and collect URLs
+        const storage = getStorage(app);
+        const existingImages = formData.images ? [...formData.images] : [];
+
+        for (const file of newFiles) {
+            try {
+                const path = `images/${formData.id}/${Date.now()}_${file.name}`;
+                const ref = storageRef(storage, path);
+                await uploadBytes(ref, file);
+                const url = await getDownloadURL(ref);
+                existingImages.push(url);
+            } catch (err) {
+                console.error('Image upload failed', err);
+            }
+        }
+
+        const finalData = { ...formData, tags: newTags, images: existingImages };
         delete finalData.price; // Don't save virtual field to DB structure strictly if we use tags
 
-        onSave(finalData);
+        await onSave(finalData);
+        setUploading(false);
     };
 
     return (
@@ -156,6 +196,27 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
                         />
                     </div>
 
+                    <div>
+                        <label className="block text-xs font-bold text-emerald-900 uppercase mb-1">Images</label>
+                        <div className="flex flex-wrap gap-3 mb-2">
+                            {(formData.images || []).map((url, i) => (
+                                <div key={i} className="relative">
+                                    <img src={url} alt={`img-${i}`} className="h-20 w-20 object-cover rounded border" />
+                                    <button type="button" onClick={() => removeExistingImage(i)} className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full h-5 w-5 text-xs">×</button>
+                                </div>
+                            ))}
+
+                            {newFiles.map((file, i) => (
+                                <div key={i} className="relative">
+                                    <img src={URL.createObjectURL(file)} alt={file.name} className="h-20 w-20 object-cover rounded border" />
+                                    <button type="button" onClick={() => removeNewFile(i)} className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full h-5 w-5 text-xs">×</button>
+                                </div>
+                            ))}
+                        </div>
+
+                        <input type="file" accept="image/*" multiple onChange={handleFileChange} />
+                    </div>
+
                     <div className="pt-4 flex justify-between items-center border-t border-emerald-900/10">
                         {book && onDelete ? (
                             <button
@@ -167,9 +228,9 @@ export default function BookEditor({ book, onSave, onCancel, onDelete }) {
                             </button>
                         ) : <div />}
 
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 items-center">
                             <Button variant="secondary" onClick={onCancel}>Cancel</Button>
-                            <Button type="submit">Save Changes</Button>
+                            <Button type="submit" disabled={uploading}>{uploading ? 'Saving...' : 'Save Changes'}</Button>
                         </div>
                     </div>
                 </form>
