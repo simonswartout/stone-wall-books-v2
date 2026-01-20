@@ -1,16 +1,63 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Coffee, ExternalLink, ChevronRight, MapPin, Mail } from "lucide-react";
 import SectionCard from '../molecules/SectionCard';
 import Button from '../atoms/Button';
+import BookEditor from './BookEditor';
 import { useAuth } from '../../contexts/AuthContext';
 import { useStore } from '../../contexts/StoreContext';
 import { signInWithPopup, GoogleAuthProvider, signOut, signInAnonymously } from 'firebase/auth';
-import { auth } from '../../lib/firebase';
+import { auth, db, appId } from '../../lib/firebase';
+import { setDoc } from 'firebase/firestore';
+import { getStoreConfigRef } from '../../lib/firestore_utils';
 
 export default function HomeDashboard({ setTab }) {
     const { user } = useAuth();
-    const { data } = useStore();
+    const { data, isLibrarian } = useStore();
     const shop = data.shop;
+
+    const [editingBook, setEditingBook] = useState(null);
+    const [isEditorOpen, setIsEditorOpen] = useState(false);
+    const [assigningSlot, setAssigningSlot] = useState(null);
+    const [assignValue, setAssignValue] = useState("");
+
+    const openEditBook = (book) => {
+        setEditingBook(book);
+        setIsEditorOpen(true);
+    };
+
+    const handleSaveBook = async (book) => {
+        const currentCatalog = data.catalog || [];
+        let newCatalog;
+        const existingIndex = currentCatalog.findIndex(b => b.id === book.id);
+        if (existingIndex >= 0) {
+            newCatalog = [...currentCatalog];
+            newCatalog[existingIndex] = book;
+        } else {
+            newCatalog = [...currentCatalog, book];
+        }
+
+        const newData = { ...data, catalog: newCatalog };
+        await setDoc(getStoreConfigRef(db, appId), newData);
+        setIsEditorOpen(false);
+    };
+
+    const handleDeleteBook = async () => {
+        if (!editingBook || !confirm("Are you sure you want to delete this book?")) return;
+
+        const newCatalog = data.catalog.filter(b => b.id !== editingBook.id);
+        const newData = { ...data, catalog: newCatalog, featured: data.featured?.map(f => f === editingBook.id ? null : f) };
+        await setDoc(getStoreConfigRef(db, appId), newData);
+        setIsEditorOpen(false);
+    };
+
+    const assignFeatured = async (slotIndex, bookId) => {
+        const newFeatured = [...(data.featured || [null, null])];
+        newFeatured[slotIndex] = bookId || null;
+        const newData = { ...data, featured: newFeatured };
+        await setDoc(getStoreConfigRef(db, appId), newData);
+        setAssigningSlot(null);
+        setAssignValue("");
+    };
 
     const loginWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
@@ -19,7 +66,7 @@ export default function HomeDashboard({ setTab }) {
         } catch (err) {
             console.error("Login failed", err);
         }
-    };
+    }; 
 
     const handleSignOut = () => {
         signOut(auth).then(() => {
@@ -28,18 +75,19 @@ export default function HomeDashboard({ setTab }) {
     };
 
     return (
-        <div className="grid gap-8 lg:grid-cols-3">
-            <div className="lg:col-span-2 space-y-8">
-                <SectionCard
-                    title="Greetings"
-                    subtitle="A note from the librarian"
-                    icon={Coffee}
-                    right={
-                        <a href={shop.ebayStoreUrl} target="_blank" rel="noreferrer">
-                            <Button>Visit eBay Store <ExternalLink className="h-4 w-4" /></Button>
-                        </a>
-                    }
-                >
+        <div className="home-hero">
+            <div className="home-hero-inner grid gap-8 lg:grid-cols-3">
+                <div className="lg:col-span-2 space-y-8">
+                    <SectionCard
+                        title="Greetings"
+                        subtitle="A note from the librarian"
+                        icon={Coffee}
+                        right={
+                            <a href={shop.ebayStoreUrl} target="_blank" rel="noreferrer">
+                                <Button>Visit eBay Store <ExternalLink className="h-4 w-4" /></Button>
+                            </a>
+                        }
+                    >
                     <div className="font-serif text-lg leading-relaxed text-emerald-900/90 space-y-4">
                         <p className="first-letter:text-5xl first-letter:font-bold first-letter:mr-3 first-letter:float-left first-letter:text-emerald-900 first-letter:leading-none">
                             Welcome to the digital collections of Stone Wall Books. Here you can view our catalog, learn about our community procurement program, or go right to our eBay store front.
@@ -79,7 +127,15 @@ export default function HomeDashboard({ setTab }) {
                                 const id = data.featured?.[i];
                                 const book = data.catalog?.find(b => b.id === id);
                                 return (
-                                    <div key={i} className="p-3 rounded border bg-emerald-50/30 flex flex-col items-start gap-2">
+                                    <div key={i} className="p-3 rounded border bg-emerald-50/30 flex flex-col items-start gap-2 relative">
+                                        {isLibrarian && (
+                                            <div className="absolute top-2 right-2 flex gap-2">
+                                                {book ? <button onClick={() => openEditBook(book)} className="text-xs px-2 py-1 bg-amber-300 text-emerald-900 rounded">Edit</button> : null}
+                                                <button onClick={() => { setAssigningSlot(i); setAssignValue(id || ""); }} className="text-xs px-2 py-1 bg-emerald-100 text-emerald-900 rounded">Assign</button>
+                                                {book ? <button onClick={() => assignFeatured(i, null)} className="text-xs px-2 py-1 bg-rose-100 text-rose-700 rounded">Clear</button> : null}
+                                            </div>
+                                        )}
+
                                         {book ? (
                                             <>
                                                 <div className="h-20 w-full overflow-hidden rounded bg-white border">
@@ -90,13 +146,26 @@ export default function HomeDashboard({ setTab }) {
                                                 <a className="mt-2 text-xs" href={book.ebayUrl} target="_blank" rel="noreferrer">View on eBay</a>
                                             </>
                                         ) : (
-                                            <div className="text-sm text-emerald-700/60">Empty slot — fill from Librarian Desk</div>
+                                            <div className="text-sm text-emerald-700/60">Empty slot — fill from Librarian Desk or assign</div>
+                                        )}
+
+                                        {assigningSlot === i && isLibrarian && (
+                                            <div className="mt-2 w-full">
+                                                <select className="w-full p-2 border rounded text-sm" value={assignValue} onChange={(e) => setAssignValue(e.target.value)}>
+                                                    <option value="">— None —</option>
+                                                    {data.catalog?.map(b => <option key={b.id} value={b.id}>{b.title} — {b.author}</option>)}
+                                                </select>
+                                                <div className="mt-2 flex gap-2 justify-end">
+                                                    <button className="text-xs px-2 py-1 bg-emerald-100 rounded" onClick={() => { assignFeatured(i, assignValue || null); }}>Save</button>
+                                                    <button className="text-xs px-2 py-1 bg-white border rounded" onClick={() => setAssigningSlot(null)}>Cancel</button>
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
                                 );
                             })}
                         </div>
-                    </div>
+                    </div> 
                 </div>
             </div>
 
@@ -118,6 +187,15 @@ export default function HomeDashboard({ setTab }) {
                     </div>
                 </div>
             </aside>
+
+            {isEditorOpen && (
+                <BookEditor
+                    book={editingBook}
+                    onSave={handleSaveBook}
+                    onCancel={() => setIsEditorOpen(false)}
+                    onDelete={editingBook ? handleDeleteBook : undefined}
+                />
+            )}
         </div>
     );
 }
