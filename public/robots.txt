@@ -1,0 +1,12 @@
+# robots.txt for Stone Wall Books
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://stonewallbooks.com/sitemap.xml
+
+# Disallow crawling of admin or sensitive areas (if any)
+# User-agent: *
+# Disallow: /admin/
